@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get my book</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* ==================================== */
+        /* BASE STYLES & LAYOUT */
+        /* ==================================== */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center; 
+            min-height: 100vh;
+            margin: 0;
+            background-color: #fcfcfc; 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+            color: #333;
+        }
+
+        #top-section {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center; /* Center content horizontally */
+            padding: 50px 20px;
+            background-color: #fcfcfc; 
+        }
+
+        .main-container {
+            display: flex;
+            gap: 80px; 
+            width: 100%;
+            max-width: 1100px; 
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+
+        .text-area {
+            flex-basis: 60%; 
+            padding-top: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .text-area h2 {
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-top: 0;
+            color: #1a1a1a;
+            transition: transform 0.15s ease-out; 
+            cursor: default; /* Show it's interactive */
+        }
+        
+        .text-area h2:hover {
+            transform: translateY(-3px); /* Bounce up slightly */
+        }
+
+        .text-area p {
+            transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+            cursor: default; /* Show it's interactive */
+            padding: 5px; 
+            border-radius: 4px;
+        }
+        
+        .text-area p:hover {
+            transform: translateY(-5px); /* Bounce up and hold */
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); /* Give it depth */
+        }
+
+        /* ORIGINAL CARD STYLES */
+        img { display: block; max-width: 60%; }
+        .stack { flex-basis: 40%; max-width: 450px; transition: 0.25s ease; flex-shrink: 0; }
+        .stack:hover { transform: rotate(5deg); }
+        .stack:hover .card:before { transform: translatey(-2%) rotate(-4deg); }
+        .stack:hover .card:after { transform: translatey(2%) rotate(4deg); }
+        .card {
+            aspect-ratio: 3 / 2;
+            border: 4px solid;
+            background-color: #fff;
+            position: relative;
+            transition: 0.15s ease;
+            cursor: pointer;
+            padding: 5% 5% 15% 5%;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .card:before, .card:after {
+            content: "";
+            display: block;
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            border: 4px solid;
+            background-color: #fff;
+            transform-origin: center center;
+            z-index: -1;
+            transition: 0.15s ease;
+            top: 0;
+            left: 0;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.05); 
+        }
+        .card:before { transform: translatey(-2%) rotate(-6deg); }
+        .card:after { transform: translatey(2%) rotate(6deg); }
+        .image {
+            width: 100%;
+            border: 4px solid;
+            background-color: #eee;
+            aspect-ratio: 1 / 1;
+            position: relative;
+        }
+        .browser-warning { display: none; }
+        @supports (aspect-ratio: 1 / 1) { .browser-warning { display: none; } }
+
+
+        /* ==================================== */
+        /* SECTION 2 - Dark Background */
+        /* ==================================== */
+
+        .call-to-action-section {
+            background-color: #282828; 
+            color: #fcfcfc;
+            width: 100%;
+            padding: 80px 20px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        /* Profile Card Styles */
+        .card-container {
+            width: 340px;
+            margin: 0; 
+            border-radius: 12px;
+            overflow: hidden;
+            font-family: 'IBM Plex Mono', monospace;
+            background: #f4f4f4;
+            border: 3px solid #000;
+            box-shadow: 6px 6px 0px #000;
+        }
+
+        .upper-container { background: #000; padding: 20px; }
+        .image-container { width: 100px; height: 100px; margin: auto; overflow: hidden; border-radius: 50%; border: 3px solid #FFD166; }
+        .image-container img { width: 100%; height: 100%; object-fit: cover; }
+        .card-container .image-container img { max-width: 100%; }
+        .lower-container { padding: 20px; text-align: center; }
+        .lower-container h3 { margin-bottom: 5px; color: #000; }
+        .lower-container h4 { margin-bottom: 15px; font-weight: normal; font-size: 14px; color: #555; }
+        .lower-container p { font-size: 13px; margin-bottom: 20px; color: #333; }
+        .lower-container .btn {
+            padding: 8px 16px;
+            background-color: #FFD166;
+            border: 2px solid #000;
+            text-decoration: none;
+            font-weight: bold;
+            color: #000;
+            box-shadow: 3px 3px 0 #000;
+            transition: 0.3s ease;
+        }
+        .lower-container .btn:hover {
+            background-color: #ffe680;
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0 #000;
+        }
+
+        /* CUSTOM BUY BUTTON STYLES */
+        .box-button {
+            cursor: pointer;
+            border: 4px solid white; 
+            background-color: #555555; 
+            padding-bottom: 10px;
+            transition: 0.1s ease-in-out;
+            user-select: none;
+            display: inline-block;
+        }
+
+        .button {
+            background-color: #dddddd;
+            border: 4px solid #fff;
+            padding: 3px 20px; 
+        }
+
+        .button span {
+            font-size: 1.2em;
+            letter-spacing: 1px;
+            color: #333; 
+            font-weight: bold;
+        }
+
+        .box-button:active {
+            padding: 0;
+            margin-bottom: 10px;
+            transform: translateY(10px);
+        }
+
+        /* ==================================== */
+        /* SHIP BUTTON STYLES (Moved inside .text-area) */
+        /* ==================================== */
+        
+        .ship-callout {
+            margin-top: auto; /* Pushes the button area to the bottom of the flex column */
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        
+        .ship-callout h3 {
+            color: #1a1a1a;
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 5px; 
+        }
+        
+        /* SHIP BUTTON CSS */
+        .ship-callout button { 
+            font-family: inherit;
+            font-size: 20px;
+            background: royalblue;
+            color: white;
+            padding: 0.7em 1em;
+            padding-left: 0.9em;
+            display: inline-flex; /* Use inline-flex for button positioning */
+            align-items: center;
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .ship-callout button span {
+            display: block;
+            margin-left: 0.3em;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .ship-callout button svg {
+            display: block;
+            transform-origin: center center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .ship-callout button:hover .svg-wrapper {
+            animation: fly-1 0.6s ease-in-out infinite alternate;
+        }
+
+        .ship-callout button:hover svg {
+            transform: translateX(1.2em) rotate(45deg) scale(1.1);
+        }
+
+        .ship-callout button:hover span {
+            transform: translateX(5em);
+        }
+
+        .ship-callout button:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes fly-1 {
+            from {
+                transform: translateY(0.1em);
+            }
+
+            to {
+                transform: translateY(-0.1em);
+            }
+        }
+
+        /* ==================================== */
+        /* COOKIE CONSENT CARD STYLES */
+        /* ==================================== */
+
+        .cookie-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.5); 
+            backdrop-filter: blur(5px); 
+            z-index: 999; 
+        }
+
+        .card-cookie { 
+            width: 300px;
+            height: 220px;
+            background-color: rgb(255, 255, 255);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 30px;
+            gap: 13px;
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            z-index: 1000; 
+            overflow: hidden;
+            box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.2); 
+            border-radius: 10px; 
+        }
+
+        #cookieSvg { width: 50px; }
+        #cookieSvg g path { fill: rgb(97, 81, 81); }
+        .cookieHeading { font-size: 1.2em; font-weight: 800; color: rgb(26, 26, 26); }
+        .cookieDescription { text-align: center; font-size: 0.7em; font-weight: 600; color: rgb(99, 99, 99); }
+        .buttonContainer { display: flex; gap: 20px; flex-direction: row; }
+        .acceptButton { width: 80px; height: 30px; background-color: #7b57ff; transition-duration: .2s; border: none; color: rgb(241, 241, 241); cursor: pointer; font-weight: 600; border-radius: 20px; }
+        .declineButton { width: 80px; height: 30px; background-color: rgb(218, 218, 218); transition-duration: .2s; color: rgb(46, 46, 46); border: none; cursor: pointer; font-weight: 600; border-radius: 20px; }
+        .declineButton:hover { background-color: #ebebeb; transition-duration: .2s; }
+        .acceptButton:hover { background-color: #9173ff; transition-duration: .2s; }
+
+        /* SCROLL DEMO CONTENT STYLES */
+        .scroll-content {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            color: #333; 
+            background-color: #ffffff; 
+            padding: 50px 20px;
+        }
+        .scroll-content p {
+            line-height: 1.6;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            border-radius: 5px;
+        }
+
+        /* ==================================== */
+        /* RESPONSIVE STYLES */
+        /* ==================================== */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                gap: 40px;
+                align-items: center; 
+            }
+            .stack, .text-area {
+                width: 100%;
+                max-width: 600px; 
+                flex-basis: auto;
+            }
+
+            /* --- ✨ NEW MOBILE ADJUSTMENTS ✨ --- */
+
+            /* Make profile card flexible */
+            .card-container {
+                width: 90%;
+            }
+
+            /* Reduce padding on main sections */
+            #top-section, .call-to-action-section {
+                padding-top: 40px;
+                padding-bottom: 40px;
+            }
+            
+            /* Adjust font sizes */
+            .text-area h2 {
+                font-size: 1.5rem;
+            }
+            
+            /* Make main image slightly larger */
+            .stack .card img {
+                max-width: 80%;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<p class="browser-warning">
+  If this looks wonky to you it's because this browser doesn't support the CSS
+  property 'aspect-ratio'.
+</p>
+
+<div id="top-section">
+    <div class="main-container">
+        <div class="stack">
+          <div class="card">
+            <div class="image">
+                <img src="uploaded:Screenshot 2025-10-24 at 1.04.19 PM.jpg-be9b356d-d18e-4787-8f2b-fadbaae4c75c" alt="Painting on Easel titled UNTITLED by VIR VAIBHAV" />
+            </div>
+          </div>
+        </div>
+        <div class="text-area">
+            <h2>   UNTITLED by vir vaibhav{pen name}</h2>
+            <p>In a world where silence often speaks louder than words, Untitled captures the quiet ache of emotions we never learn to name.</p>
+            <p>Each page is a reflection of unspoken thoughts, lost moments, and the beauty hidden inside pain.
+              This book isn’t about answers — it’s about feelings that refuse to fade.
+              It’s for those who have loved deeply, fallen quietly, and risen again without applause.</p>
+            
+            <div class="ship-callout">
+                <h3>Ready to get book?</h3>
+                <p>Click the button below to order!</p>
+                <a href="https://vislabs-web.github.io/select_plan/" class="btn">
+                <button id="shipButton">
+                  <div class="svg-wrapper-1">
+                    <div class="svg-wrapper">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        width="24"
+                        height="24"
+                      >
+                        <path fill="none" d="M0 0h24v24H0z"></path>
+                        <path
+                          fill="currentColor"
+                          d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"
+                        ></path>
+                      </svg>
+                    </div>
+                  </div>
+                  <span>Get</span>
+                </button>
+            </a>
+            </div>
+            </div>
+    </div>
+</div>
+
+<div class="call-to-action-section">
+    
+    <a href="https://vislabs-web.github.io/select_plan/" class="box-button mb-8" id="buyButton">
+    <div class="button"><span>I WANT TO BUY</span></div>
+     </a>
+    <div class="card-container mb-12">
+        <div class="upper-container">
+            <div class="image-container">
+                <img 
+                    src="https://placehold.co/100x100/191e2e/FFD166?text=V" 
+                    alt="Profile Placeholder" 
+                    onerror="this.onerror=null;this.src='https://placehold.co/100x100/191e2e/FFD166?text=V';"
+                />
+            </div>
+        </div>
+
+        <div class="lower-container">
+            <div>
+                <h3>VAIBHAV</h3>
+                <h4>Student and Web Developer</h4>
+            </div>
+            <div>
+                <p>I am 16 years old boy, who do not have any talent.</p>
+            </div>
+            <div>
+                <a href="https://www.instagram.com/its_vir_vaibhav/" class="btn" id="profileLink">View Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row justify-center items-center gap-6 w-full max-w-lg">
+
+        <section class="flex justify-center items-center">
+          <a
+            href="https://www.instagram.com/its_vir_vaibhav/"
+            class="group flex justify-center p-2 rounded-md drop-shadow-xl from-gray-800 bg-[#a21caf] text-white font-semibold hover:translate-y-3 hover:rounded-[50%] transition-all duration-500 hover:from-[#331029] hover:to-[#310413]"
+            id="instagramBtn"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="1em"
+              height="1.2em"
+              viewBox="0 0 24 24"
+              stroke-width="1"
+              fill="currentColor"
+              stroke="currentColor"
+              class="w-5"
+            >
+              <path
+                d="M12.001 9C10.3436 9 9.00098 10.3431 9.00098 12C9.00098 13.6573 10.3441 15 12.001 15C13.6583 15 15.001 13.6569 15.001 12C15.001 10.3427 13.6579 9 12.001 9ZM12.001 7C14.7614 7 17.001 9.2371 17.001 12C17.001 14.7605 14.7639 17 12.001 17C9.24051 17 7.00098 14.7629 7.00098 12C7.00098 9.23953 9.23808 7 12.001 7ZM18.501 6.74915C18.501 7.43926 17.9402 7.99917 17.251 7.99917C16.5609 7.99917 16.001 7.4384 16.001 6.74915C16.001 6.0599 16.5617 5.5 17.251 5.5C17.9393 5.49913 18.501 6.0599 18.501 6.74915ZM12.001 4C9.5265 4 9.12318 4.00655 7.97227 4.0578C7.18815 4.09461 6.66253 4.20007 6.17416 4.38967C5.74016 4.55799 5.42709 4.75898 5.09352 5.09255C4.75867 5.4274 4.55804 5.73963 4.3904 6.17383C4.20036 6.66332 4.09493 7.18811 4.05878 7.97115C4.00703 9.0752 4.00098 9.46105 4.00098 12C4.00098 14.4745 4.00753 14.8778 4.05877 16.0286C4.0956 16.8124 4.2012 17.3388 4.39034 17.826C4.5591 18.2606 4.7605 18.5744 5.09246 18.9064C5.42863 19.2421 5.74179 19.4434 6.17187 19.6094C6.66619 19.8005 7.19148 19.9061 7.97212 19.9422C9.07618 19.9939 9.46203 20 12.001 20C14.4755 20 14.8788 19.9934 16.0296 19.9422C16.8117 19.9055 17.3385 19.7996 17.827 19.6106C18.2604 19.4423 18.5752 19.2402 18.9074 18.9085C19.2436 18.5718 19.4445 18.2594 19.6107 17.8283C19.8013 17.3358 19.9071 16.8098 19.9432 16.0289C19.9949 14.9248 20.001 14.5389 20.001 12C20.001 9.52552 19.9944 9.12221 19.9432 7.97137C19.9064 7.18906 19.8005 6.66149 19.6113 6.17318C19.4434 5.74038 19.2417 5.42635 18.9084 5.09255C18.573 4.75715 18.2616 4.55693 17.8271 4.38942C17.338 4.19954 16.8124 4.09396 16.0298 4.05781C14.9258 4.00605 14.5399 4 12.001 4ZM12.001 2C14.7176 2 15.0568 2.01 16.1235 2.06C17.1876 2.10917 17.9135 2.2775 18.551 2.525C19.2101 2.77917 19.7668 3.1225 20.3226 3.67833C20.8776 4.23417 21.221 4.7925 21.476 5.45C21.7226 6.08667 21.891 6.81333 21.941 7.8775C21.9885 8.94417 22.001 9.28333 22.001 12C22.001 14.7167 21.991 15.0558 21.941 16.1225C21.8918 17.1867 21.7226 17.9125 21.476 18.55C21.2218 19.2092 20.8776 19.7658 20.3226 20.3217C19.7668 20.8767 19.2076 21.22 18.551 21.475C17.9135 21.7217 17.1876 21.89 16.1235 21.94C15.0568 21.9875 14.7176 22 12.001 22C9.28431 22 8.94514 21.99 7.87848 21.94C6.81431 21.8908 6.08931 21.7217 5.45098 21.475C4.79264 21.2208 4.23514 20.8767 3.67931 20.3217C3.12348 19.7658 2.78098 19.2067 2.52598 18.55C2.27848 17.9125 2.11098 17.1867 2.06098 16.1225C2.01348 15.0558 2.00098 14.7167 2.00098 12C2.00098 9.28333 2.01098 8.94417 2.06098 7.8775C2.11014 6.8125 2.27848 6.0875 2.52598 5.45C2.78014 4.79167 3.12348 4.23417 3.67931 3.67833C4.23514 3.1225 4.79348 2.78 5.45098 2.525C6.08848 2.2775 6.81348 2.11 7.87848 2.06C8.94514 2.0125 9.28431 2 12.001 2Z"
+              ></path>
+            </svg>
+            <span
+              class="absolute opacity-0 group-hover:opacity-100 group-hover:text-gray-700 group-hover:text-sm group-hover:-translate-y-10 duration-700"
+            >
+              Instagram
+            </span>
+          </a>
+        </section>
+
+        <section class="flex justify-center items-center">
+            <a
+                href="https://www.youtube.com/@VIS_LAB123"
+                class="group flex justify-center p-2 rounded-md drop-shadow-xl bg-[#CD201F] from-gray-800 text-white font-semibold hover:translate-y-3 hover:rounded-[50%] transition-all duration-500 hover:from-[#331029] hover:to-[#310413]"
+                id="youtubeBtn"
+            >
+                <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="1em"
+                height="1em"
+                viewBox="0 0 576 512"
+                stroke-width="0"
+                fill="currentColor"
+                stroke="currentColor"
+                >
+                <path
+                    d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"
+                ></path>
+                </svg>
+                <span
+                class="absolute opacity-0 group-hover:opacity-100 group-hover:text-gray-700 group-hover:text-sm group-hover:-translate-y-10 duration-700"
+                >
+                Youtube
+                </span>
+            </a>
+        </section>
+
+        <section class="flex justify-center items-center">
+            <a
+                href="https://discord.gg/Z4NCrQchu"
+                class="group flex justify-center p-2 rounded-md drop-shadow-xl bg-[#7289da] from-gray-800 text-white font-semibold hover:translate-y-3 hover:rounded-[50%] transition-all duration-500 hover:from-[#331029] hover:to-[#310413]"
+                id="discordBtn"
+            >
+                <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="1em"
+                height="1em"
+                viewBox="0 0 640 512"
+                stroke-width="0"
+                fill="currentColor"
+                stroke="currentColor"
+                >
+                <path
+                    d="M524.531,69.836a1.5,1.5,0,0,0-.764-.7A485.065,485.065,0,0,0,404.081,32.03a1.816,1.816,0,0,0-1.923.91,337.461,337.461,0,0,0-14.9,30.6,447.848,447.848,0,0,0-134.426,0,309.541,309.541,0,0,0-15.135-30.6,1.89,1.89,0,0,0-1.924-.91A483.689,483.689,0,0,0,116.085,69.137a1.712,1.712,0,0,0-.788.676C39.068,183.651,18.186,294.69,28.43,404.354a2.016,2.016,0,0,0,.765,1.375A487.666,487.666,0,0,0,176.02,479.918a1.9,1.9,0,0,0,2.063-.676A348.2,348.2,0,0,0,208.12,430.4a1.86,1.86,0,0,0-1.019-2.588,321.173,321.173,0,0,1-45.868-21.853,1.885,1.885,0,0,1-.185-3.126c3.082-2.309,6.166-4.711,9.109-7.137a1.819,1.819,0,0,1,1.9-.256c96.229,43.917,200.41,43.917,295.5,0a1.812,1.812,0,0,1,1.924.233c2.944,2.426,6.027,4.851,9.132,7.16a1.884,1.884,0,0,1-.162,3.126,301.407,301.407,0,0,1-45.89,21.83,1.875,1.875,0,0,0-1,2.611,391.055,391.055,0,0,0,30.014,48.815,1.864,1.864,0,0,0,2.063.7A486.048,486.048,0,0,0,610.7,405.729a1.882,1.882,0,0,0,.765-1.352C623.729,277.594,590.933,167.465,524.531,69.836ZM222.491,337.58c-28.972,0-52.844-26.587-52.844-59.239S193.056,219.1,222.491,219.1c29.665,0,53.306,26.82,52.843,59.239C275.334,310.993,251.924,337.58,222.491,337.58Zm195.38,0c-28.971,0-52.843-26.587-52.843-59.239S388.437,219.1,417.871,219.1c29.667,0,53.307,26.82,52.844,59.239C470.715,310.993,447.538,337.58,417.871,337.58Z"
+                ></path>
+                </svg>
+                <span
+                class="absolute opacity-0 group-hover:opacity-100 group-hover:text-gray-700 group-hover:text-sm group-hover:-translate-y-10 duration-700"
+                >
+                Discord
+                </span>
+            </a>
+        </section>
+    </div>
+</div>
+<div class="cookie-backdrop" id="cookieBackdrop"></div>
+
+<div class="card-cookie" id="cookieCard">
+ <svg version="1.1" id="cookieSvg" x="0px" y="0px" viewBox="0 0 122.88 122.25" xml:space="preserve"><g><path d="M101.77,49.38c2.09,3.1,4.37,5.11,6.86,5.78c2.45,0.66,5.32,0.06,8.7-2.01c1.36-0.84,3.14-0.41,3.97,0.95 c0.28,0.46,0.42,0.96,0.43,1.47c0.13,1.4,0.21,2.82,0.24,4.26c0.03,1.46,0.02,2.91-0.05,4.35h0v0c0,0.13-0.01,0.26-0.03,0.38 c-0.91,16.72-8.47,31.51-20,41.93c-11.55,10.44-27.06,16.49-43.82,15.69v0.01h0c-0.13,0-0.26-0.01-0.38-0.03 c-16.72-0.91-31.51-8.47-41.93-20C5.31,90.61-0.73,75.1,0.07,58.34H0.07v0c0-0.13,0.01-0.26,0.03-0.38 C1,41.22,8.81,26.35,20.57,15.87C32.34,5.37,48.09-0.73,64.85,0.07V0.07h0c1.6,0,2.89,1.29,2.89,2.89c0,0.4-0.08,0.78-0.23,1.12 c-1.17,3.81-1.25,7.34-0.27,10.14c0.89,2.54,2.7,4.51,5.41,5.52c1.44,0.54,2.2,2.1,1.74,3.55l0.01,0 c-1.83,5.89-1.87,11.08-0.52,15.26c0.82,2.53,2.14,4.69,3.88,6.4c1.74,1.72,3.9,3,6.39,3.78c4.04,1.26,8.94,1.18,14.31-0.55 C99.73,47.78,101.08,48.3,101.77,49.38L101.77,49.38z M59.28,57.86c2.77,0,5.01,2.24,5.01,5.01c0,2.77-2.24,5.01-5.01,5.01 c-2.77,0-5.01-2.24-5.01-5.01C54.27,60.1,56.52,57.86,59.28,57.86L59.28,57.86z M37.56,78.49c3.37,0,6.11,2.73,6.11,6.11 s-2.73,6.11-6.11,6.11s-6.11-2.73-6.11-6.11S34.18,78.49,37.56,78.49L37.56,78.49z M50.72,31.75c2.65,0,4.79,2.14,4.79,4.79 c0,2.65-2.14,4.79-4.79,4.79c-2.65,0-4.79-2.14-4.79-4.79C45.93,33.89,48.08,31.75,50.72,31.75L50.72,31.75z M119.3,32.4 c1.98,0,3.58,1.6,3.58,3.58c0,1.98-1.6,3.58-3.58,3.58s-3.58-1.6-3.58-3.58C115.71,34.01,117.32,32.4,119.3,32.4L119.3,32.4z M93.62,22.91c2.98,0,5.39,2.41,5.39,5.39c0,2.98-2.41,5.39-5.39,5.39c-2.98,0-5.39-2.41-5.39-5.39 C88.23,25.33,90.64,22.91,93.62,22.91L93.62,22.91z M97.79,0.59c3.19,0,5.78,2.59,5.78,5.78c0,3.19-2.59,5.78-5.78,5.78 c-3.19,0-5.78-2.59-5.78-5.78C92.02,3.17,94.6,0.59,97.79,0.59L97.79,0.59z M76.73,80.63c4.43,0,8.03,3.59,8.03,8.03 c0,4.43-3.59,8.03-8.03,8.03s-8.03-3.59-8.03-8.03C68.7,84.22,72.29,80.63,76.73,80.63L76.73,80.63z M31.91,46.78 c4.8,0,8.69,3.89,8.69,8.69c0,4.8-3.89,8.69-8.69,8.69s-8.69-3.89-8.69-8.69C23.22,50.68,27.11,46.78,31.91,46.78L31.91,46.78z M107.13,60.74c-3.39-0.91-6.35-3.14-8.95-6.48c-5.78,1.52-11.16,1.41-15.76-0.02c-3.37-1.05-6.32-2.81-8.71-5.18 c-2.39-2.37-4.21-5.32-5.32-8.75c-1.51-4.66-1.69-10.2-0.18-16.32c-3.1-1.8-5.25-4.53-6.42-7.88c-1.06-3.05-1.28-6.59-0.61-10.35 C47.27,5.95,34.3,11.36,24.41,20.18C13.74,29.69,6.66,43.15,5.84,58.29l0,0.05v0h0l-0.01,0.13v0C5.07,73.72,10.55,87.82,20.02,98.3 c9.44,10.44,22.84,17.29,38,18.1l0.05,0h0v0l0.13,0.01h0c15.24,0.77,29.35-4.71,39.83-14.19c10.44-9.44,17.29-22.84,18.1-38l0-0.05 v0h0l0.01-0.13v0c0.07-1.34,0.09-2.64,0.06-3.91C112.98,61.34,109.96,61.51,107.13,60.74L107.13,60.74z M116.15,64.04L116.15,64.04 L116.15,64.04L116.15,64.04z M58.21,116.42L58.21,116.42L58.21,116.42L58.21,116.42z"></path></g></svg>
+  <p class="cookieHeading">We use cookies.</p>
+  <p class="cookieDescription">This website uses cookies to ensure you get the best experience on our site.</p>
+
+  <div class="buttonContainer">
+    <button class="acceptButton" id="acceptBtn">Allow</button>
+  <button class="declineButton" id="declineBtn">Decline</button>
+  </div>
+</div>
+
+<audio id="clickSFX" src="click.mp3" preload="auto"></audio> 
+
+<script>
+    // All your Javascript remains the same...
+    // ====================================
+    // CUSTOM SFX SETUP
+    // ====================================
+    const audioElement = document.getElementById('clickSFX');
+
+    function playCustomSFX() {
+        if (audioElement) {
+            if (audioElement.readyState >= 2) {
+                audioElement.currentTime = 0; 
+                audioElement.play().catch(e => console.log('Audio playback initiated, but may be blocked until first user click:', e));
+            } else {
+                 audioElement.load();
+            }
+        }
+    }
+    
+    // ====================================
+    // UI LOGIC
+    // ====================================
+    const cookieCard = document.getElementById('cookieCard');
+    const cookieBackdrop = document.getElementById('cookieBackdrop');
+    const acceptButton = document.getElementById('acceptBtn');
+    const declineButton = document.getElementById('declineBtn');
+
+    function hideCookieCard() {
+        if (cookieCard) {
+            cookieCard.remove();
+        }
+        if (cookieBackdrop) {
+            cookieBackdrop.remove();
+        }
+    }
+
+    // --- ATTACHING SFX AND ACTIONS ---
+    if (acceptButton) {
+        acceptButton.addEventListener('click', () => { playCustomSFX(); hideCookieCard(); });
+    }
+    if (declineButton) {
+        declineButton.addEventListener('click', () => { playCustomSFX(); hideCookieCard(); });
+    }
+
+    const shipButton = document.getElementById('shipButton');
+    if (shipButton) {
+        shipButton.addEventListener('click', playCustomSFX);
+    }
+
+    const buyButton = document.getElementById('buyButton');
+    if (buyButton) {
+        buyButton.addEventListener('click', playCustomSFX);
+    }
+
+    const profileLink = document.getElementById('profileLink');
+    if (profileLink) {
+        profileLink.addEventListener('click', (e) => { 
+            e.preventDefault(); 
+            playCustomSFX(); 
+            setTimeout(() => {
+                 window.location.href = profileLink.href;
+            }, 50);
+        });
+    }
+    
+    const socialButtons = ['instagramBtn', 'youtubeBtn', 'discordBtn'];
+    socialButtons.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                playCustomSFX();
+                setTimeout(() => {
+                    window.location.href = btn.href;
+                }, 50);
+            });
+        }
+    });
+
+    console.log("Custom audio SFX logic loaded.");
+</script>
+
+</body>
+</html>
